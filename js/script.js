@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const apiUrl = "https://api.github.com/repos/haynako0/ipynb_site/contents/ipynb";
+    const apiUrl = "https://api.github.com/repos/NickCore18/ipynb_site/contents/ipynb";
+    // const apiUrl = "https://api.github.com/repos/haynako0/ipynb_site/contents/ipynb";
     // Hello for those who want to make their own! You need to change the API accordingly for this to work. - Erl Softer
     // https://api.github.com/repos/(GitHub Username)/(Repository)/contents/(Folder Name)
 
