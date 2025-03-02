@@ -1,6 +1,6 @@
 async function fetchLastUpdatedDate() {
     try {
-        const response = await fetch('https://api.github.com/repos/haynako0/ipynb_site/deployments', {
+        const response = await fetch('https://api.github.com/repos/NickCore18/ipynb_site/deployments', {
             headers: {
                 Accept: 'application/vnd.github.v3+json'
             }
