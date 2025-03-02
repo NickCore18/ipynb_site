@@ -35,9 +35,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 // Hello for those who want to make their own! You need to change these links accordingly to your own links for this to work. - Erl Softer
                 // Just change "haynako0", "ipynb_site", "main" and "ipynb" accordingly.
-                const notebookUrl = `https://nbviewer.jupyter.org/github/haynako0/ipynb_site/blob/main/ipynb/${notebook.name}`;
-                const repoUrl = `https://github.com/haynako0/ipynb_site/blob/main/ipynb/${notebook.name}`;
-                const colabUrl = `https://colab.research.google.com/github/haynako0/ipynb_site/blob/main/ipynb/${notebook.name}`;
+                const notebookUrl = `https://nbviewer.jupyter.org/github/NickCore18/ipynb_site/blob/main/ipynb/${notebook.name}`;
+                const repoUrl = `https://github.com/NickCore18/ipynb_site/blob/main/ipynb/${notebook.name}`;
+                const colabUrl = `https://colab.research.google.com/github/NickCore18/ipynb_site/blob/main/ipynb/${notebook.name}`;
 
                 const notebookPreview = document.createElement("div");
                 notebookPreview.classList.add("col-md-6", "mb-4", "notebook-preview", "border", "p-3");
