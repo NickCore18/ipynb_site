@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Cache response
             localStorage.setItem(cacheKey, JSON.stringify(data));
-            localStorage.setItem(cacheExpiryKey, new Date().getTime() + 3600000); // 1 hour cache
+            localStorage.setItem(cacheExpiryKey, new Date().getTime() + 60000); // 1 hour cache
             return data;
         } catch (error) {
             console.error("Error fetching notebooks:", error);
