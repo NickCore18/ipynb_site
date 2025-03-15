@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const data = await response.json();
             
             localStorage.setItem(cacheKey, JSON.stringify(data));
-            localStorage.setItem(cacheExpiryKey, new Date().getTime() + 60000);
+            localStorage.setItem(cacheExpiryKey, new Date().getTime() + 3600000);
             return data;
         } catch (error) {
             console.error("Error fetching notebooks:", error);
