@@ -2,9 +2,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const apiUrl = "https://api.github.com/repos/NickCore18/ipynb_site/contents/ipynb";
     const cacheKey = "notebooksCache";
     const cacheExpiryKey = "notebooksCacheExpiry";
+    let searchAndSortAdded = false;
 
     async function fetchNotebooks() {
-        // Check cache first
         const cachedData = localStorage.getItem(cacheKey);
         const cacheExpiry = localStorage.getItem(cacheExpiryKey);
         
@@ -17,9 +17,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (!response.ok) throw new Error("Failed to fetch notebooks.");
             const data = await response.json();
             
-            // Cache response
             localStorage.setItem(cacheKey, JSON.stringify(data));
-            localStorage.setItem(cacheExpiryKey, new Date().getTime() + 60000); // 1 hour cache
+            localStorage.setItem(cacheExpiryKey, new Date().getTime() + 60000);
             return data;
         } catch (error) {
             console.error("Error fetching notebooks:", error);
@@ -66,6 +65,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function addSearchAndSort() {
+        if (searchAndSortAdded) return;
+        searchAndSortAdded = true;
         const controlsContainer = document.getElementById("notebooks");
         controlsContainer.insertAdjacentHTML("afterbegin", `
             <div class="mb-3 d-flex justify-content-center">
