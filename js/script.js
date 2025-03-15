@@ -31,15 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
         previewContainer.innerHTML = "";
         
         if (notebooks.length === 0) {
-            previewContainer.innerHTML = `
-                <h2>No notebooks found.</h2>
-                <button id="retry-fetch" class="btn btn-primary">Retry Fetching</button>
-            `;
-            document.getElementById("retry-fetch").addEventListener("click", () => {
-                localStorage.removeItem(cacheKey);
-                localStorage.removeItem(cacheExpiryKey);
-                loadNotebooks();
-            });
+            previewContainer.innerHTML = `<h2>No notebooks found.</h2>`;
             return;
         }
 
