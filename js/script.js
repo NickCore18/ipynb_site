@@ -1,13 +1,25 @@
 document.addEventListener("DOMContentLoaded", function() {
     const apiUrl = "https://api.github.com/repos/NickCore18/ipynb_site/contents/ipynb";
-    // const apiUrl = "https://api.github.com/repos/haynako0/ipynb_site/contents/ipynb";
-    // Hello for those who want to make their own! You need to change the API accordingly for this to work. - Erl Softer
-    // https://api.github.com/repos/(GitHub Username)/(Repository)/contents/(Folder Name)
+    const cacheKey = "notebooksCache";
+    const cacheExpiryKey = "notebooksCacheExpiry";
 
     async function fetchNotebooks() {
+        // Check cache first
+        const cachedData = localStorage.getItem(cacheKey);
+        const cacheExpiry = localStorage.getItem(cacheExpiryKey);
+        
+        if (cachedData && cacheExpiry && new Date().getTime() < cacheExpiry) {
+            return JSON.parse(cachedData);
+        }
+
         try {
             const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error("Failed to fetch notebooks.");
             const data = await response.json();
+            
+            // Cache response
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            localStorage.setItem(cacheExpiryKey, new Date().getTime() + 3600000); // 1 hour cache
             return data;
         } catch (error) {
             console.error("Error fetching notebooks:", error);
@@ -15,73 +27,88 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    async function renderNotebookPreviews() {
+    function renderNotebookPreviews(notebooks) {
         const previewContainer = document.getElementById("preview-container");
-        const notebooks = await fetchNotebooks();
-
+        previewContainer.innerHTML = "";
+        
         if (notebooks.length === 0) {
-            previewContainer.innerHTML = "<h2>No notebooks found.</h2>";
+            previewContainer.innerHTML = `
+                <h2>No notebooks found.</h2>
+                <button id="retry-fetch" class="btn btn-primary">Retry Fetching</button>
+            `;
+            document.getElementById("retry-fetch").addEventListener("click", () => {
+                localStorage.removeItem(cacheKey);
+                localStorage.removeItem(cacheExpiryKey);
+                loadNotebooks();
+            });
             return;
         }
 
-        let row;
-        notebooks.forEach((notebook, index) => {
+        notebooks.forEach(notebook => {
             if (notebook.name.endsWith(".ipynb")) {
-                if (index % 2 === 0) {
-                    row = document.createElement("div");
-                    row.classList.add("row", "mb-4");
-                    previewContainer.appendChild(row);
-                }
-
-                // Hello for those who want to make their own! You need to change these links accordingly to your own links for this to work. - Erl Softer
-                // Just change "haynako0", "ipynb_site", "main" and "ipynb" accordingly.
                 const notebookUrl = `https://nbviewer.jupyter.org/github/NickCore18/ipynb_site/blob/main/ipynb/${notebook.name}`;
                 const repoUrl = `https://github.com/NickCore18/ipynb_site/blob/main/ipynb/${notebook.name}`;
                 const colabUrl = `https://colab.research.google.com/github/NickCore18/ipynb_site/blob/main/ipynb/${notebook.name}`;
 
-                const notebookPreview = document.createElement("div");
-                notebookPreview.classList.add("col-md-6", "mb-4", "notebook-preview", "border", "p-3");
-
-                const notebookTitle = document.createElement("h3");
-                notebookTitle.textContent = notebook.name.replace(".ipynb", "");
-                notebookPreview.appendChild(notebookTitle);
-
-                const notebookIframe = document.createElement("iframe");
-                notebookIframe.src = notebookUrl;
-                notebookIframe.title = "Jupyter Notebook Preview";
-                notebookIframe.allowFullscreen = true;
-                notebookIframe.style.height = "300px";
-                notebookIframe.style.width = "100%";
-                notebookIframe.setAttribute("sandbox", "allow-same-origin allow-scripts");
-                notebookPreview.appendChild(notebookIframe);
-
-                const repoButton = document.createElement("a");
-                repoButton.href = repoUrl;
-                repoButton.textContent = "View in Github";
-                repoButton.classList.add("btn", "btn-primary", "mt-2", "me-2");
-                repoButton.target = "_blank";
-                notebookPreview.appendChild(repoButton);
-
-                const nbviewerButton = document.createElement("a");
-                nbviewerButton.href = notebookUrl;
-                nbviewerButton.textContent = "View in nbviewer";
-                nbviewerButton.classList.add("btn", "btn-success", "mt-2", "me-2");
-                nbviewerButton.target = "_blank";
-                notebookPreview.appendChild(nbviewerButton);
-
-                const colabButton = document.createElement("a");
-                colabButton.href = colabUrl;
-                colabButton.textContent = "Open in Google Colab";
-                colabButton.classList.add("btn", "btn-warning", "mt-2");
-                colabButton.target = "_blank";
-                notebookPreview.appendChild(colabButton);
-
-                const currentRow = previewContainer.lastElementChild;
-                currentRow.appendChild(notebookPreview);
+                previewContainer.innerHTML += `
+                    <div class="col-md-6 notebook-preview border p-3">
+                        <h3>${notebook.name.replace(".ipynb", "")}</h3>
+                        <iframe src="${notebookUrl}" title="Notebook Preview" allowfullscreen style="width: 100%; height: 300px;"></iframe>
+                        <div class="mt-2">
+                            <a href="${repoUrl}" class="btn btn-primary me-2" target="_blank">GitHub</a>
+                            <a href="${notebookUrl}" class="btn btn-success me-2" target="_blank">nbviewer</a>
+                            <a href="${colabUrl}" class="btn btn-warning" target="_blank">Colab</a>
+                        </div>
+                    </div>
+                `;
             }
         });
-        
     }
 
-    renderNotebookPreviews();
+    function addSearchAndSort() {
+        const controlsContainer = document.getElementById("notebooks");
+        controlsContainer.insertAdjacentHTML("afterbegin", `
+            <div class="mb-3">
+                <input type="text" id="search-input" class="form-control" placeholder="Search notebooks...">
+                <select id="sort-select" class="form-select mt-2">
+                    <option value="alpha-asc">Sort: A-Z</option>
+                    <option value="alpha-desc">Sort: Z-A</option>
+                    <option value="date-new">Sort: Newest</option>
+                    <option value="date-old">Sort: Oldest</option>
+                </select>
+            </div>
+        `);
+    }
+
+    function handleSearchAndSort(notebooks) {
+        document.getElementById("search-input").addEventListener("input", function() {
+            const searchTerm = this.value.toLowerCase();
+            const filtered = notebooks.filter(nb => nb.name.toLowerCase().includes(searchTerm));
+            renderNotebookPreviews(filtered);
+        });
+
+        document.getElementById("sort-select").addEventListener("change", function() {
+            let sortedNotebooks = [...notebooks];
+            if (this.value === "alpha-asc") {
+                sortedNotebooks.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (this.value === "alpha-desc") {
+                sortedNotebooks.sort((a, b) => b.name.localeCompare(a.name));
+            } else if (this.value === "date-new") {
+                sortedNotebooks.sort((a, b) => new Date(b.git_commit_date) - new Date(a.git_commit_date));
+            } else if (this.value === "date-old") {
+                sortedNotebooks.sort((a, b) => new Date(a.git_commit_date) - new Date(b.git_commit_date));
+            }
+            renderNotebookPreviews(sortedNotebooks);
+        });
+    }
+
+    async function loadNotebooks() {
+        const notebooks = await fetchNotebooks();
+        addSearchAndSort();
+        renderNotebookPreviews(notebooks);
+        handleSearchAndSort(notebooks);
+    }
+
+    loadNotebooks();
 });
+
