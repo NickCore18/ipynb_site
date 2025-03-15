@@ -68,14 +68,18 @@ document.addEventListener("DOMContentLoaded", function() {
     function addSearchAndSort() {
         const controlsContainer = document.getElementById("notebooks");
         controlsContainer.insertAdjacentHTML("afterbegin", `
-            <div class="mb-3">
-                <input type="text" id="search-input" class="form-control" placeholder="Search notebooks...">
-                <select id="sort-select" class="form-select mt-2">
-                    <option value="alpha-asc">Sort: A-Z</option>
-                    <option value="alpha-desc">Sort: Z-A</option>
-                    <option value="date-new">Sort: Newest</option>
-                    <option value="date-old">Sort: Oldest</option>
-                </select>
+            <div class="mb-3 d-flex justify-content-center">
+                <div class="w-50">
+                    <input type="text" id="search-input" class="form-control" placeholder="Search notebooks...">
+                </div>
+                <div class="ms-2 w-25">
+                    <select id="sort-select" class="form-select">
+                        <option value="alpha-asc">Sort: A-Z</option>
+                        <option value="alpha-desc">Sort: Z-A</option>
+                        <option value="date-new">Sort: Newest</option>
+                        <option value="date-old">Sort: Oldest</option>
+                    </select>
+                </div>
             </div>
         `);
     }
@@ -111,4 +115,3 @@ document.addEventListener("DOMContentLoaded", function() {
 
     loadNotebooks();
 });
-
